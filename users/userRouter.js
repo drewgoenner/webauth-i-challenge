@@ -46,7 +46,7 @@ router.post('/login', (req, res) => {
     }
 });
 
-router.get('/users', (req, res) => {
+router.get('/users', protected, (req, res) => {
     Users.find()
       .then(users => {
           res.json(users);
