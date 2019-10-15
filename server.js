@@ -2,9 +2,11 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const session = require('express-session')
+const KnexSessionStore = require('connect-session-knex')(session)
 
 const userRouter = require('./users/userRouter.js');
 const protected = require('./users/protected-middleware.js');
+const knexConfig = require('./data/dbConfig.js')
 
 const server = express();
 
@@ -17,7 +19,12 @@ const sessionConfig = {
         httpOnly: true,
     },
     resave: false,
-    saveUninitialized: false, // GDPR laws against setting cookies automatically
+    saveUninitialized: true, // GDPR laws against setting cookies automatically
+    store: new KnexSessionStore({
+        knex: knexConfig,
+        createtable: true,
+        clreaInterval: 1000 * 60 * 30,
+    })
 }
 
 server.use(helmet());
