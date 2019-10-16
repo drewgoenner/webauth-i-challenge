@@ -33,6 +33,7 @@ router.post('/login', (req, res) => {
           .first()
           .then(user => {
               if(user && bcrypt.compareSync(password, user.password)) {
+                  req.session.user = user;
                   res.status(200).json({ message: `Welcome, ${user.username}`});
               } else {
                   res.status(401).json({ message: 'Invalid Username/Password'});
@@ -56,5 +57,19 @@ router.get('/users', protected, (req, res) => {
       });
 
 });
+
+router.get('/logout', (req, res) => {
+    if(req.session) {
+        req.session.destroy(err => {
+            if(err) {
+                res.json({ message: 'unable to log user out'})
+            } else {
+                res.status(200).json({ message: 'Logged out successfully'});
+            }
+        })
+    } else {
+        res.status(200).json({ message: 'No session found'});
+    }
+})
 
 module.exports = router;
